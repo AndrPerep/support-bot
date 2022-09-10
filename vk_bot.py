@@ -5,12 +5,14 @@ from dotenv import load_dotenv
 from os import getenv
 from vk_api.longpoll import VkLongPoll, VkEventType
 
+from get_dialogflow_answer import get_answer
 
-def echo(event, vk_api):
+
+def send_message(event, vk_api):
     vk_api.messages.send(
         user_id=event.user_id,
-        message=event.text,
-        random_id=random.randint(1,1000)
+        message=get_answer(event.text),
+        random_id=random.randint(1, 1000)
     )
 
 
@@ -22,4 +24,4 @@ if __name__ == '__main__':
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            echo(event, vk_api)
+            send_message(event, vk_api)
