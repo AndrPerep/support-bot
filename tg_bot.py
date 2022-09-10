@@ -36,14 +36,15 @@ def start_bot():
 
 def send_message(bot):
     global update_id
+    session_id = getenv('TG_CHAT_ID')
     # Request updates after the last update_id
     for update in bot.getUpdates(offset=update_id, timeout=10):
         update_id = update.update_id + 1
 
-        if update.message:  # your bot can receive updates without messages
-            # Reply to the message
+        if update.message:  # bot can receive updates without messages
+            answer, fallback = get_answer(update.message.text, session_id)
             print(update.message.text)
-            update.message.reply_text(get_answer(update.message.text))
+            update.message.reply_text(answer)
 
 
 if __name__ == '__main__':
