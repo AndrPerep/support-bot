@@ -14,7 +14,7 @@ def echo(event, vk_api):
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     load_dotenv()
     vk_token = getenv('VK_TOKEN')
     vk_session = vk.VkApi(token=vk_token)
