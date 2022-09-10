@@ -43,7 +43,6 @@ def send_message(bot):
 
         if update.message:  # bot can receive updates without messages
             answer, fallback = get_answer(update.message.text, session_id)
-            print(update.message.text)
             update.message.reply_text(answer)
 
 

@@ -32,8 +32,6 @@ def create_intent(display_name, intent_phrases):
         request={"parent": parent, "intent": intent}
     )
 
-    print("Intent created: {}".format(response))
-
 
 if __name__ == '__main__':
     phrases_filename = 'phrases.json'
