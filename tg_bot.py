@@ -1,21 +1,34 @@
 import telegram
-from telegram.error import NetworkError, Unauthorized
+import logging
 
 from time import sleep
+from telegram.error import NetworkError, Unauthorized
 from dotenv import load_dotenv
 from os import getenv
 
 from get_dialogflow_answer import get_answer
 
+
 update_id = None
+logger = logging.getLogger('TelegramHandler')
 
 
-def start_bot():
+def main():
     global update_id
 
     load_dotenv()
-    tg_token = getenv('TG_TOKEN')
-    bot = telegram.Bot(tg_token)
+    bot = telegram.Bot(getenv('TG_TOKEN'))
+    admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
+    admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
+
+    class TelegramHandler(logging.Handler):
+        def emit(self, record):
+            log_entry = self.format(record)
+            admin_bot.send_message(chat_id=admin_tg_chat_id, text=log_entry)
+
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TelegramHandler())
+    logger.info('Telegram bot started')
 
     # get the first pending update_id, this is so we can skip over it in case
     # we get an "Unauthorized" exception.
@@ -42,9 +55,11 @@ def send_message(bot):
         update_id = update.update_id + 1
 
         if update.message:  # bot can receive updates without messages
+            user_message = update.message.text
             answer, fallback = get_answer(update.message.text, session_id)
             update.message.reply_text(answer)
+            logger.info(f'Telegram bot\nUser: {user_message}\nFallback: {fallback}\nBot: {answer}')
 
 
 if __name__ == '__main__':
-    start_bot()
+    main()
