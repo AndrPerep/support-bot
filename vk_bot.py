@@ -42,7 +42,7 @@ def main():
 
     logger.setLevel(logging.INFO)
     logger.addHandler(TelegramHandler())
-    logger.info('Telegram bot started')
+    logger.info('VK bot started')
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
