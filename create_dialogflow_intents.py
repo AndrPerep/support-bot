@@ -34,8 +34,8 @@ def create_intent(display_name, intent_phrases):
 def main():
     load_dotenv()
 
-    phrases_filename = 'phrases.json'
-    with open(phrases_filename, 'r', encoding='utf-8') as phrases_file:
+    phrases_file = getenv('PHRASES_FILE', default='phrases.json')
+    with open(phrases_file, 'r', encoding='utf-8') as phrases_file:
         phrases_json = phrases_file.read()
 
     phrases = loads(phrases_json)
