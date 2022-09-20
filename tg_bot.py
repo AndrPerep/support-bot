@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 from get_dialogflow_answer import get_answer
+from handler import TelegramHandler
 
 
 update_id = None
@@ -20,13 +21,8 @@ def main():
     session_id = getenv('TG_CHAT_ID')
     project_id = getenv('DIALOG_FLOW_PROJECT_ID')
     bot = telegram.Bot(getenv('TG_TOKEN'))
-    admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
-    admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
-
-    class TelegramHandler(logging.Handler):
-        def emit(self, record):
-            log_entry = self.format(record)
-            admin_bot.send_message(chat_id=admin_tg_chat_id, text=log_entry)
+    # admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
+    # admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
 
     logger.setLevel(logging.INFO)
     logger.addHandler(TelegramHandler())
