@@ -4,10 +4,7 @@ from json import loads
 from os import getenv
 
 
-def create_intent(display_name, intent_phrases, project_id):
-    training_phrases_parts = intent_phrases['questions']
-    message_texts = [intent_phrases['answer']]
-
+def create_intent(display_name, training_phrases_parts, message_texts, project_id):
     intents_client = dialogflow.IntentsClient()
 
     parent = dialogflow.AgentsClient.agent_path(project_id)
@@ -42,7 +39,10 @@ def main():
     phrases = loads(phrases_json)
 
     for display_name, intent_phrases in phrases.items():
-        create_intent(display_name, intent_phrases, project_id)
+        training_phrases_parts = intent_phrases['questions']
+        message_texts = [intent_phrases['answer']]
+
+        create_intent(display_name, training_phrases_parts, message_texts, project_id)
 
 
 if __name__ == '__main__':
