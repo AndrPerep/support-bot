@@ -4,10 +4,9 @@ from json import loads
 from os import getenv
 
 
-def create_intent(display_name, intent_phrases):
+def create_intent(display_name, intent_phrases, project_id):
     training_phrases_parts = intent_phrases['questions']
     message_texts = [intent_phrases['answer']]
-    project_id = getenv('DIALOG_FLOW_PROJECT_ID')
 
     intents_client = dialogflow.IntentsClient()
 
@@ -35,13 +34,15 @@ def main():
     load_dotenv()
 
     phrases_file = getenv('PHRASES_FILE', default='phrases.json')
+    project_id = getenv('DIALOG_FLOW_PROJECT_ID')
+
     with open(phrases_file, 'r', encoding='utf-8') as phrases_file:
         phrases_json = phrases_file.read()
 
     phrases = loads(phrases_json)
 
     for display_name, intent_phrases in phrases.items():
-        create_intent(display_name, intent_phrases)
+        create_intent(display_name, intent_phrases, project_id)
 
 
 if __name__ == '__main__':

@@ -3,10 +3,8 @@ from google.cloud import dialogflow
 from os import getenv
 
 
-def get_answer(user_message, session_id, language_code='ru-RU'):
+def get_answer(user_message, session_id, project_id, language_code='ru-RU'):
     session_client = dialogflow.SessionsClient()
-
-    project_id = getenv('DIALOG_FLOW_PROJECT_ID')
 
     session = session_client.session_path(project_id, session_id)
     text_input = dialogflow.TextInput(text=user_message, language_code=language_code)

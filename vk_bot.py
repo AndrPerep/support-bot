@@ -13,9 +13,9 @@ from get_dialogflow_answer import get_answer
 logger = logging.getLogger('TelegramHandler')
 
 
-def send_message(event, vk_api):
+def send_message(event, vk_api, project_id):
     user_message = event.text
-    answer, fallback = get_answer(user_message, event.user_id)
+    answer, fallback = get_answer(user_message, event.user_id, project_id)
     if not fallback:
         vk_api.messages.send(
             user_id=event.user_id,
@@ -28,6 +28,7 @@ def send_message(event, vk_api):
 def main():
     load_dotenv()
 
+    project_id = getenv('DIALOG_FLOW_PROJECT_ID')
     admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
     admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
     vk_token = getenv('VK_TOKEN')
@@ -46,7 +47,7 @@ def main():
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            send_message(event, vk_api)
+            send_message(event, vk_api, project_id)
 
 
 if __name__ == '__main__':
