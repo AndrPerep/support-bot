@@ -5,8 +5,6 @@ from os import getenv
 
 
 def create_intent(display_name, intent_phrases):
-    load_dotenv()
-
     training_phrases_parts = intent_phrases['questions']
     message_texts = [intent_phrases['answer']]
     project_id = getenv('DIALOG_FLOW_PROJECT_ID')
@@ -33,7 +31,9 @@ def create_intent(display_name, intent_phrases):
     )
 
 
-if __name__ == '__main__':
+def main():
+    load_dotenv()
+
     phrases_filename = 'phrases.json'
     with open(phrases_filename, 'r', encoding='utf-8') as phrases_file:
         phrases_json = phrases_file.read()
@@ -42,3 +42,7 @@ if __name__ == '__main__':
 
     for display_name, intent_phrases in phrases.items():
         create_intent(display_name, intent_phrases)
+
+
+if __name__ == '__main__':
+    main()
