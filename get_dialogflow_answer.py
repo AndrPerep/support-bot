@@ -1,6 +1,5 @@
 from google.api_core.exceptions import InvalidArgument
 from google.cloud import dialogflow
-from os import getenv
 
 
 def get_answer(user_message, session_id, project_id, language_code='ru-RU'):

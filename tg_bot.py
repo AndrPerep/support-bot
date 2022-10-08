@@ -1,61 +1,43 @@
-import telegram
 import logging
 
-from time import sleep
-from telegram.error import NetworkError, Unauthorized
 from dotenv import load_dotenv
+from telegram.ext import Updater
+from telegram import Update
+from telegram.ext import CallbackContext, MessageHandler, Filters
 from os import getenv
+from functools import partial
 
-from get_dialogflow_answer import get_answer
 from handler import TelegramHandler
+from get_dialogflow_answer import get_answer
 
 
-update_id = None
 logger = logging.getLogger('TelegramHandler')
 
 
-def main():
-    global update_id
+def send_message(session_id, project_id, update: Update, context: CallbackContext) -> None:
+    user_message = update.message.text
+    answer, fallback = get_answer(user_message, session_id, project_id)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=answer)
+    logger.info(f'TG bot\nUser: {user_message}\nFallback: {fallback}\nBot: {answer}')
 
+
+def main():
     load_dotenv()
+    token = getenv('TG_TOKEN')
     session_id = getenv('TG_CHAT_ID')
     project_id = getenv('DIALOG_FLOW_PROJECT_ID')
-    bot = telegram.Bot(getenv('TG_TOKEN'))
-    # admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
-    # admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
 
     logger.setLevel(logging.INFO)
     logger.addHandler(TelegramHandler())
     logger.info('Telegram bot started')
 
-    # get the first pending update_id, this is so we can skip over it in case
-    # we get an "Unauthorized" exception.
-    try:
-        update_id = bot.getUpdates()[0].update_id
-    except IndexError:
-        update_id = None
+    updater = Updater(token=token, use_context=True)
+    dispatcher = updater.dispatcher
 
-    while True:
-        try:
-            send_message(bot, project_id, session_id)
-        except NetworkError:
-            sleep(1)
-        except Unauthorized:
-            # The user has removed or blocked the bot.
-            update_id += 1
+    dispatcher.add_handler(
+        MessageHandler(Filters.text & ~Filters.command, partial(send_message, session_id, project_id)))
 
-
-def send_message(bot, project_id, session_id):
-    global update_id
-    # Request updates after the last update_id
-    for update in bot.getUpdates(offset=update_id, timeout=10):
-        update_id = update.update_id + 1
-
-        if update.message:  # bot can receive updates without messages
-            user_message = update.message.text
-            answer, fallback = get_answer(update.message.text, session_id, project_id)
-            update.message.reply_text(answer)
-            logger.info(f'Telegram bot\nUser: {user_message}\nFallback: {fallback}\nBot: {answer}')
+    updater.start_polling()
 
 
 if __name__ == '__main__':
