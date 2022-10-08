@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from os import getenv
 from vk_api.longpoll import VkLongPoll, VkEventType
 
+from handler import TelegramHandler
 from get_dialogflow_answer import get_answer
 
 
@@ -29,17 +30,10 @@ def main():
     load_dotenv()
 
     project_id = getenv('DIALOG_FLOW_PROJECT_ID')
-    admin_bot = telegram.Bot(getenv('ADMIN_BOT_TOKEN'))
-    admin_tg_chat_id = getenv('ADMIN_CHAT_ID')
     vk_token = getenv('VK_TOKEN')
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
-
-    class TelegramHandler(logging.Handler):
-        def emit(self, record):
-            log_entry = self.format(record)
-            admin_bot.send_message(chat_id=admin_tg_chat_id, text=log_entry)
 
     logger.setLevel(logging.INFO)
     logger.addHandler(TelegramHandler())
